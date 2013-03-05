@@ -1,7 +1,8 @@
 function buildA()
 
     load('expressionMatrixCombainedByStructure.mat');
-    ontology = load('buildStructureOntology/humanOntology.mat');
+    load('onlyCorrelativeProbes.mat'); load('expressionMatrixCombainedByStructure.mat','allStructures','location_std','location_xyz','reverseIndex');
+    ontology = load('humanOntology.mat');
 
     someChecks( allStructures, ontology);
 
@@ -9,6 +10,15 @@ function buildA()
     
     ontology.adjacancyMatrix = distanceToAdjacancy(ontology.unDirectedDistanceMatrix/4);
     reducedOntology.adjacancyMatrix = distanceToAdjacancy(reducedOntology.unDirectedDistanceMatrix/4);
+    
+    
+    [correlationMatrix, validStrcturesIndices1, validStrcturesIndices2] = computeCorrelationBetweenExpressionMatrix(dataMatrix(:,:,1), dataMatrix(:,:,2), allStructures);
+    [correlationMatrix, validStrcturesIndices1, validStrcturesIndices2] = computeCorrelationBetweenExpressionMatrix(dataMatrixOfSelectedProbes(:,:,1), dataMatrixOfSelectedProbes(:,:,2), allStructures);
+    
+    adjacencyMatrixSource = reducedOntology.adjacancyMatrix(validStrcturesIndices1,validStrcturesIndices1);
+    adjacencyMatrixDestination = reducedOntology.adjacancyMatrix(validStrcturesIndices2,validStrcturesIndices2);
+    allStructuresSource = allStructures(validStrcturesIndices1, :);
+    allStructuresDestination = allStructures(validStrcturesIndices2, :);
     
     regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination);
     
@@ -28,7 +38,7 @@ end
 function reducedOntology = reduceOntologyList(allStructures, ontology)
 
     % use both the full structure name and the short to reduce the ontology
-    % so the ontology will contain only structures which appear in the expriment
+    % so the ontology will contain only structures which appear in the experiment
     
     fullAndShort = strcat(allStructures(:,3), allStructures(:,2));
     fullAndShortOntology = strcat(ontology.structureLabels(:,4), ontology.structureLabels(:,3));
