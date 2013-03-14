@@ -7,7 +7,7 @@ function [cleanCorrelationMatrix, rowsIndices, columnIndices] = computeCorrelati
     %correlationBetweenRegions = corr(expressionMatrix1, expressionMatrix2, 'type', 'Spearman');
 
     [cleanCorrelationMatrix, cleanLabelsRows, cleanLabelsColumns, rowsIndices, columnIndices] = removeNaNRowsAndColumn(correlationBetweenRegions, regionLabels);
-    %imagesc(cleanCorrelationMatrix); colorbar;
+    imagesc(cleanCorrelationMatrix); colorbar;
 end
 
 function [cleanCorrelationMatrix, cleanLabelsRows, cleanLabelsColumns, rowsIndices, columnIndices] = removeNaNRowsAndColumn(inputMatrix, matrixLabels)

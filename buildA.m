@@ -1,18 +1,16 @@
 function buildA()
 
-    load('expressionMatrixCombainedByStructure.mat');
+    %load('expressionMatrixCombainedByStructure.mat');
     load('onlyCorrelativeProbes.mat'); load('expressionMatrixCombainedByStructure.mat','allStructures','location_std','location_xyz','reverseIndex');
     ontology = load('humanOntology.mat');
 
     someChecks( allStructures, ontology);
 
+    [ontology.bellowThresholdIndices,ontology.unDirectedDistanceMatrixThresholded]  = thresholdByDistance(ontology.unDirectedDistanceMatrix, 6);
+    ontology.adjacancyMatrix = distanceToAdjacancy(ontology.unDirectedDistanceMatrixThresholded);
     reducedOntology = reduceOntologyList(allStructures, ontology);
-    
-    ontology.adjacancyMatrix = distanceToAdjacancy(ontology.unDirectedDistanceMatrix/4);
-    reducedOntology.adjacancyMatrix = distanceToAdjacancy(reducedOntology.unDirectedDistanceMatrix/4);
-    
-    
-    [correlationMatrix, validStrcturesIndices1, validStrcturesIndices2] = computeCorrelationBetweenExpressionMatrix(dataMatrix(:,:,1), dataMatrix(:,:,2), allStructures);
+  
+    %[correlationMatrix, validStrcturesIndices1, validStrcturesIndices2] = computeCorrelationBetweenExpressionMatrix(dataMatrix(:,:,1), dataMatrix(:,:,2), allStructures);
     [correlationMatrix, validStrcturesIndices1, validStrcturesIndices2] = computeCorrelationBetweenExpressionMatrix(dataMatrixOfSelectedProbes(:,:,1), dataMatrixOfSelectedProbes(:,:,2), allStructures);
     
     adjacencyMatrixSource = reducedOntology.adjacancyMatrix(validStrcturesIndices1,validStrcturesIndices1);
@@ -20,8 +18,17 @@ function buildA()
     allStructuresSource = allStructures(validStrcturesIndices1, :);
     allStructuresDestination = allStructures(validStrcturesIndices2, :);
     
+    %threshold the adjacancy
+    sortedWeights =  sort(adjacencyMatrixDestination(:));
+    theTopForthPercential = adjacencyMatrixDestination > sortedWeights(ceil(length(sortedWeights)* 0.75));
+    
     regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination);
     
+end
+
+function [bellowThresholdIndices,distanceMatrix]  = thresholdByDistance(distanceMatrix, distanceThreshold)
+    bellowThresholdIndices = distanceMatrix < distanceThreshold;
+    distanceMatrix(~bellowThresholdIndices) = inf;
 end
 
 function adjacancyMatrix = distanceToAdjacancy(distanceMatrix)
@@ -48,6 +55,8 @@ function reducedOntology = reduceOntologyList(allStructures, ontology)
     reducedOntology.structureLabels = ontology.structureLabels(appears,:);
     reducedOntology.unDirectedDistanceMatrix = ontology.unDirectedDistanceMatrix(appears,appears);
     reducedOntology.directedDistanceMatrix = ontology.directedDistanceMatrix(appears,appears);
+    reducedOntology.adjacancyMatrix = ontology.adjacancyMatrix(appears,appears);
+    reducedOntology.bellowThresholdIndices = ontology.bellowThresholdIndices(appears,appears);
 
 end
 
@@ -69,6 +78,11 @@ function someChecks(allStructures, ontology)
     
     appears = ismember(fullAndShort, fullAndShortOntology);
     assert(all(appears))
+    
+    simalirity = zeros(size(ontology.unDirectedDistanceMatrix));
+    simalirity(ontology.unDirectedDistanceMatrix < 7 ) = 1;
+    simalirity = simalirity - eye(size(simalirity));
+    a = spectralClutering(simalirity,10);
 end
 
 function index = duplicates(A)

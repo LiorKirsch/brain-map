@@ -56,13 +56,13 @@ function [A,b] = buildLeastSquareProblem(correlationMatrix, adjacencyMatrixSourc
 
     
     [rowNodes, columnNodes] = find(adjacencyMatrixSource);
-    G = zeros( length(rowNodes) * n, m*n);
+    G = sparse( length(rowNodes) * n, m*n);
     runningIndex = 1;
     for i=1:length(rowNodes)
         rowNode = rowNodes(i);
         columnNode = columnNodes(i);
         
-        tmpMatrix = zeros(n, m*n);
+        tmpMatrix = sparse(n, m*n);
         
         one_index = (rowNode -1) * (1:n) + m;
         minus_one_index = (columnNode -1) * (1:n) + m;
@@ -74,13 +74,13 @@ function [A,b] = buildLeastSquareProblem(correlationMatrix, adjacencyMatrixSourc
     end
 
     [rowNodesDestination, columnNodesDestination] = find(adjacencyMatrixDestination);% +
-    F = zeros( length(rowNodesDestination) * m, m*n); % +
+    F = sparse( length(rowNodesDestination) * m, m*n); % +
     runningIndex = 1;
     for i=1:length(rowNodesDestination)
         rowNode = rowNodesDestination(i);
         columnNode = columnNodesDestination(i);
         
-        tmpMatrix = zeros(m, m*n); % +
+        tmpMatrix = sparse(m, m*n); % +
         
         one_index = (rowNode -1) * n  + 1:m; % +
         minus_one_index = (columnNode -1) * n + 1:m ; % +
@@ -91,6 +91,6 @@ function [A,b] = buildLeastSquareProblem(correlationMatrix, adjacencyMatrixSourc
         runningIndex = runningIndex + m; % +
     end
     
-    A = [ones(m*n); G ; F];
+    A = [sparse(ones(m*n)); G ; F];
     b = [correlationMatrix(:) ; zeros(length(rowNodes) + length(rowNodesDestination),1)];
 end
