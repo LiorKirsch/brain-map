@@ -1,18 +1,23 @@
-function distance = meansureDistanceFromMapping(ontology)
-    
-    [~, recCount] = countChildrenRec(1, ontology.dependecyMatrix);
-    firstCommonParent = getFirstParent(ontology.dependecyMatrix);
-    childUnderParent = zeros(size(ontology.dependecyMatrix));
+function meansureDistanceFromMapping()
+% finds the first common parent of all posible pairs
+    load('humanOntology.mat');
+
+    [totalNumberOfNodes, numberOfChildNodes] = countChildrenRec(1, dependecyMatrix);
+    firstCommonParent = getFirstParent(dependecyMatrix);
+    childUnderParent = zeros(size(dependecyMatrix));
     for i=1:length(firstCommonParent(:))
        if firstCommonParent(i) ~= 0 
-          childUnderParent(i) =  recCount(firstCommonParent(i));
+          childUnderParent(i) =  numberOfChildNodes(firstCommonParent(i));
        end
     end
-
+    similarityMeasure = childUnderParent / totalNumberOfNodes;
+    
+    save('humanOntology.mat');
 end
 
 
 function firstCommonParent = getFirstParent(ontologyDependecy)
+% finds the first common parent of all posible pairs
     allParents = inv(eye(size(ontologyDependecy)) - ontologyDependecy) - eye(size(ontologyDependecy));
     allPairs = nchoosek(2:size(ontologyDependecy,2),2);
     firstCommonParent = zeros(size(ontologyDependecy));
@@ -28,6 +33,7 @@ function firstCommonParentIndex = findFirstCommonParent(vectorA, vectorB)
     firstCommonParentIndex = max( find(jointParents));
 end
 function [nodeCount, recCount] = countChildrenRec(nodeIndex, ontologyDependecy)
+    % Counts the number of nodes under the current node
     
     recCount = zeros(size(ontologyDependecy,1),1);
     nodeCount = 0;

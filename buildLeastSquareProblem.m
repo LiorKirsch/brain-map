@@ -1,4 +1,4 @@
-function [A,b] = buildLeastSquareProblem(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination)
+function [A,b] = buildLeastSquareProblem(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination, lambda)
 % adjacencyMatrixSource should be a square m_m matrix
 % adjacencyMatrixDestination should be a square n_n matrix
 % correlationMatrix should be a square m_n matrix
@@ -91,6 +91,6 @@ function [A,b] = buildLeastSquareProblem(correlationMatrix, adjacencyMatrixSourc
         runningIndex = runningIndex + m; % +
     end
     
-    A = [sparse(ones(m*n)); G ; F];
-    b = [correlationMatrix(:) ; zeros(length(rowNodes) + length(rowNodesDestination),1)];
+    A = [speye(m*n); lambda*G ; lambda*F];
+    b = [correlationMatrix(:) ; zeros(size(G,1) + size(F,1),1)];
 end

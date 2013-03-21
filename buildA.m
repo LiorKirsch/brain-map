@@ -22,10 +22,44 @@ function buildA()
     sortedWeights =  sort(adjacencyMatrixDestination(:));
     theTopForthPercential = adjacencyMatrixDestination > sortedWeights(ceil(length(sortedWeights)* 0.75));
     
-    regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination);
+    regionSimilarityOnlyCorrelation = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,0);
+    measureSimilarity(regionSimilarityOnlyCorrelation, validStrcturesIndices1, validStrcturesIndices2, reducedOntology )
     
+ %   load('regionSimilarity.mat','regionSimilarity');
+    %regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,1);
+    regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,10);
+    %save('regionSimilarity.mat','regionSimilarity','regionSimilarityOnlyCorrelation');
+    
+    measureSimilarity(regionSimilarity, validStrcturesIndices1, validStrcturesIndices2, reducedOntology )
 end
 
+function measureSimilarity(regionSimilarity, validStrcturesIndices1, validStrcturesIndices2, reducedOntology )
+    
+    ontologySimilarity = reducedOntology.similarityMeasure + reducedOntology.similarityMeasure';
+    ontologySimilarity = ontologySimilarity(validStrcturesIndices1, validStrcturesIndices2);
+    sourceOntology = reduceOntologyToIndexes(reducedOntology, validStrcturesIndices1);
+    destinationOntology = reduceOntologyToIndexes(reducedOntology, validStrcturesIndices1);
+    
+    % PLEASE CHECK THIS !!!!!!!!!!!!!!!!!!
+    [bestMatchScore_Source, bestMatchIndex_Source] = max(regionSimilarity,[],2);
+    [bestMatchScore_Destination, bestMatchIndex_Destination] = max(regionSimilarity,[],1);
+    distances_Source = zeros(size(bestMatchIndex_Source));
+    for i =1:length(bestMatchIndex_Source)
+        distances_Source(i) = ontologySimilarity(i, bestMatchIndex_Source(i));
+    end
+    
+    distances_Destination = zeros(size(bestMatchIndex_Destination));
+    for i =1:length(bestMatchIndex_Source)
+        distances_Destination(i) = ontologySimilarity(bestMatchIndex_Destination(i), i);
+    end
+    
+    subplot(2,1,1);
+    hist(ontologySimilarity(:),50);
+    subplot(2,1,2);
+    hist(distances_Destination,50);
+    figure; imagesc(regionSimilarity); colorbar;
+    
+end
 function [bellowThresholdIndices,distanceMatrix]  = thresholdByDistance(distanceMatrix, distanceThreshold)
     bellowThresholdIndices = distanceMatrix < distanceThreshold;
     distanceMatrix(~bellowThresholdIndices) = inf;
@@ -50,14 +84,18 @@ function reducedOntology = reduceOntologyList(allStructures, ontology)
     fullAndShort = strcat(allStructures(:,3), allStructures(:,2));
     fullAndShortOntology = strcat(ontology.structureLabels(:,4), ontology.structureLabels(:,3));
     appears = ismember(fullAndShortOntology , fullAndShort);
-    
+    reducedOntology = reduceOntologyToIndexes(ontology, appears);
+end
+
+function reducedOntology = reduceOntologyToIndexes(ontology, appears)
     reducedOntology.dependecyMatrix = ontology.dependecyMatrix(appears,appears);
     reducedOntology.structureLabels = ontology.structureLabels(appears,:);
     reducedOntology.unDirectedDistanceMatrix = ontology.unDirectedDistanceMatrix(appears,appears);
     reducedOntology.directedDistanceMatrix = ontology.directedDistanceMatrix(appears,appears);
     reducedOntology.adjacancyMatrix = ontology.adjacancyMatrix(appears,appears);
     reducedOntology.bellowThresholdIndices = ontology.bellowThresholdIndices(appears,appears);
-
+    reducedOntology.similarityMeasure = ontology.similarityMeasure(appears,appears);
+ 
 end
 
 function someChecks(allStructures, ontology)
