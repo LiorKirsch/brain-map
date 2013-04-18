@@ -14,7 +14,4 @@ function IDX = spectralClutering(similarityMatrix, k, normalized)
     bottomKeigenVectors = eigenvectors(:,1:k);
     
     IDX = kmeans(bottomKeigenVectors,k);
-    
-    
-    
 end

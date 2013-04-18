@@ -17,6 +17,17 @@ function [correlationBetweenRegions, rowsIndices, columnIndices] = computeCorrel
     imagesc(correlationBetweenRegions); colorbar;
 end
 
+% close all
+% correlationBetweenRegions = corr(cleanExpressionMatrix1, cleanExpressionMatrix2);
+% subplot(1,2,1)
+% imagesc(correlationBetweenRegions); colorbar;
+% subplot(1,2,2)
+% cleanExpressionMatrix1 = normalizeRows(cleanExpressionMatrix1);
+% cleanExpressionMatrix2 = normalizeRows(cleanExpressionMatrix2);
+% correlationBetweenRegions = corr(cleanExpressionMatrix1, cleanExpressionMatrix2);
+% imagesc(correlationBetweenRegions); colorbar;
+
+
 function normalizedMatrix = normalizeRows(matrix)
     numberOfColumns = size(matrix,2);
     meanMatrix = repmat( mean(matrix,2), 1, numberOfColumns);

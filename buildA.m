@@ -22,12 +22,12 @@ function buildA()
     sortedWeights =  sort(adjacencyMatrixDestination(:));
     theTopForthPercential = adjacencyMatrixDestination > sortedWeights(ceil(length(sortedWeights)* 0.75));
     
-    regionSimilarityOnlyCorrelation = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,0);
-    measureSimilarity(regionSimilarityOnlyCorrelation, validStrcturesIndices1, validStrcturesIndices2, reducedOntology )
+%    regionSimilarityOnlyCorrelation = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,0);
+%    measureSimilarity(regionSimilarityOnlyCorrelation, validStrcturesIndices1, validStrcturesIndices2, reducedOntology )
     
  %   load('regionSimilarity.mat','regionSimilarity');
     %regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,1);
-    regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,10);
+    regionSimilarity = computeRegionSimilarities(correlationMatrix, adjacencyMatrixSource, adjacencyMatrixDestination,100);
     %save('regionSimilarity.mat','regionSimilarity','regionSimilarityOnlyCorrelation');
     
     measureSimilarity(regionSimilarity, validStrcturesIndices1, validStrcturesIndices2, reducedOntology )

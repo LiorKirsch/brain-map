@@ -1,18 +1,18 @@
 function meansureDistanceFromMapping()
 % finds the first common parent of all posible pairs
-    load('humanOntology.mat');
+    humanOntology = load('humanOntology.mat');
 
-    [totalNumberOfNodes, numberOfChildNodes] = countChildrenRec(1, dependecyMatrix);
-    firstCommonParent = getFirstParent(dependecyMatrix);
-    childUnderParent = zeros(size(dependecyMatrix));
+    [humanOntology.totalNumberOfNodes, humanOntology.numberOfChildNodes] = countChildrenRec(1, humanOntology.dependecyMatrix);
+    firstCommonParent = getFirstParent(humanOntology.dependecyMatrix);
+    childUnderParent = zeros(size(humanOntology.dependecyMatrix));
     for i=1:length(firstCommonParent(:))
        if firstCommonParent(i) ~= 0 
-          childUnderParent(i) =  numberOfChildNodes(firstCommonParent(i));
+          childUnderParent(i) =  humanOntology.numberOfChildNodes(firstCommonParent(i));
        end
     end
-    similarityMeasure = childUnderParent / totalNumberOfNodes;
+    humanOntology.similarityMeasure = childUnderParent / humanOntology.totalNumberOfNodes;
     
-    save('humanOntology.mat');
+    save('humanOntology.mat', '-struct', 'humanOntology');
 end
 
 
