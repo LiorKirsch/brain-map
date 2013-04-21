@@ -1,6 +1,13 @@
 cross species mapping
 =========
 
+meansureDistanceFromMapping()
+computes several stuff for the ontology
+> 1. firstCommonParent - the first common parent for each two nodes.
+> 2. childUnderParent - for each pair of nodes (i,j) shows how many child nodes their common parent have.
+> 3. similarityMeasure - The similarity between nodes (i,j) is the number of nodes under their common parent divided by the total number of nodes in the tree.
+
+
 [correlationBetweenRegions, rowsIndices, columnIndices] = computeCorrelationBetweenExpressionMatrix(expressionMatrix1, expressionMatrix2, regionLabels)
 > Computes the region correlation between two subjects.
 > 1. remove NaN columns.
